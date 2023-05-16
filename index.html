@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            d3.tsv("github-viewer.tsv", (data) => {
+                // console.log(data[Object.keys(data)[0]])
+                if(data[Object.keys(data)[0]].length == 0)$(".tdata").append("<br>")
+                else if(data[Object.keys(data)[1]].length <= 1)$(".tdata").append(`<li><a href="${data[Object.keys(data)[0]]}">%%%%%%%No Title%%%%%%%%</a></li>`);
+                    else $(".tdata").append(`<li><a href="${data[Object.keys(data)[0]]}">${data[Object.keys(data)[1]]}</a></li>`);
+                //  tr td
+                //$('#myTable tr:last').after('<tr>...</tr><tr>...</tr>');
+                // $('#myTable > tbody:last-child').append('<tr>...</tr><tr>...</tr>');
+            })
+        })
+    </script>
+    <style>
+        body{
+            width:100vw;
+            height:100vh;
+            overflow-x: hidden;
+            
+        }
+        body *{
+            text-decoration: none;
+        }
+        li{
+            list-style:none
+        }
+    </style>
+</head>
+<body>
+    <div class="tdata"></div>
+</body>
+
+</html>

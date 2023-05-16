@@ -5,7 +5,6 @@ allowanceforemptyline = 6
 linkname = "link"
 titlename = "title"
 
-
 # dont change this
 notfoundcount = 0
 runcounter = 0

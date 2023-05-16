@@ -11,7 +11,7 @@ notfoundcount = 0
 runcounter = 0
 writer.write(f"{linkname}\t{titlename}\n")
 while True:
-    line = reader.readline()
+    line = reader.readline().replace('"','')
     index = 0
     found = False
     for words in line:

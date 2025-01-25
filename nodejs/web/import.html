@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>Import</h2>
+    <textarea title="import" id="import" style="width:90vw;height: 300px;"></textarea>
+    <select title="cars" class="cars" id="cars1">
+        <option value="volvo">Volvo</option>
+    </select><br>
+    <button id="importhtml">import data</button>
+    or
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Upload</button>
+      </form>
+    <h2>Export</h2>
+    <select title="cars" class="cars" id="cars2">
+        <option value="volvo">Volvo</option>
+    </select><br>
+    <script is:inline>
+        $(document).ready(() => {
+
+
+            $.get('/api/tables', {}, async function (result) {
+                let res = '';
+                await result.forEach(data => {
+                    res += `<option value=${data.Tables_in_onetab}>${data.Tables_in_onetab}</option>`
+                })
+                $('.cars').html(res)
+                $("#exporthtml").attr("href", `/export/${result[0].Tables_in_onetab}`);
+            });
+            $("#cars").change(function () {
+                $("#exporthtml").attr("href", `/export/${$('#cars2').val()}`);
+            })
+            $("#importhtml").click(function () {
+                $.post(`/import/${$('#cars1').val()}`, {
+                    data: $('#import').val()
+                }, function (result) {
+                    alert(JSON.stringify(result));
+                    window.location.href ="/table/" + $('#cars1').val();
+                });
+            });
+        });
+
+    </script>
+    <a href="/download" id="exporthtml"><button>download</button></a>
+    <br>
+    <br>
+    <button onclick="history.back()">Go Back</button>
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+{
+    "name": "convert to CSV",
+    "description": "This extension converts your bookmark to CSV in order to import into google sheet ",
+    "version": "0.1.0",
+    "permissions": ["storage", "downloads"],
+    "manifest_version": 3,
+    "action": {
+      "default_popup": "hello.html",
+      "default_icon": "hello_extensions.png"
+    }
+  }

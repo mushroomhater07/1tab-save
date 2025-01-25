@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <title>Document</title>
+</head>
+
+<body id="content-to-export">
+
+  <h2>Performance of each player</h2>
+  <dialog>
+    <h2>Delete current table</h2>
+    <button id="deletetable">delete</button>
+    <hr>
+    <h2>Create new table</h2>
+    <form id="newtable">
+      <input type="text" name="table" id="table" placeholder="Table name">
+      <button>Create</button>
+    </form>
+    <br />
+    <button autofocus>Close</button>
+
+  </dialog>
+  <button><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+      <path d="M12 5V19M5 12h14" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg></button>
+  <select title="cars" id="cars">
+    <option value="volvo">Volvo</option>
+  </select>
+  <a href="/import">Import and Export</a>
+  <button id="printpdf">Export PDF</button>
+  <div id="place-here"></div>
+
+  <script is:inline>
+    $(document).ready(() => {
+      const dialog = document.querySelector("dialog");
+      const showButton = document.querySelector("dialog + button");
+      const closeButton = document.querySelector("dialog button");
+
+      // "Show the dialog" button opens the dialog modally
+      showButton.addEventListener("click", () => {
+        dialog.showModal();
+      });
+
+      // "Close" button closes the dialog
+      closeButton.addEventListener("click", () => {
+        dialog.close();
+      });
+      $("#newtable").submit(function (e) {
+        e.preventDefault();
+        $.post('/api/createtable', {
+          table: $('#table').val()
+        }, function (result) {
+          alert(result);
+          dialog.close();
+          window.location.href = `/tables/${$('#table').val()}`;
+        });
+      });
+
+
+
+      let gettable;
+
+      $.get('/api/tables', {}, async function (resultemp) {
+        result = resultemp;
+        let res = '';
+        await result.forEach(data => {
+          console.log(data.Tables_in_onetab)
+          data.name == undefined?
+          res += `<option value=${data.Tables_in_onetab}>${data.Tables_in_onetab}</option>`:
+          res += `<option value=${data.name}>${data.name}</option>`
+        })
+        $('#cars').html(res)
+        
+        gettable = result[0].name == undefined?result[0].Tables_in_onetab:result[0].name;
+
+        let path = window.location.pathname;
+        const match = path.match(/(?<=\/table\/).*/);
+        let i;
+        if (match != null) {
+          gettable = match[0];
+          let value123 = gettable;
+          let indexshown;
+
+          for (i = 0; i < $("#cars")[0].options.length; i++) {
+            if ($("#cars")[0].options[i].value === value123) {
+              break;
+            }
+          }
+        }
+
+        $("#deletetable").click(() => {
+          $.get(`/deletetable/${gettable}`, {}, function (result) {
+            alert(JSON.stringify(result));
+            dialog.close();
+            window.location.href = `/`;
+          });
+        })
+
+
+        $.get(`/api/data/${gettable}`, {}, async function (resultemp) {
+         
+          result = resultemp; console.log(result)
+          let res = '';
+          await result.forEach(data => {
+            res += ` <button id="item${data.id}" class="deleteitembutton"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12">
+                    <path d="M12 5V19M5 12h14" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg></button>${data.id}<a href=${data.URL}>${data.Title}</a><br>`
+          })
+          $('#place-here').html(res)
+        });
+
+        $(document).on('click', '.deleteitembutton', function (event) {
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          console.log(`$(this).attr('id')`)
+          let id = $(this).attr('id').replace('item', '');
+          $.get(`/deleteitem/${gettable}/${id}`, {}, function (result) {
+            alert(JSON.stringify(result));
+            window.location.reload();
+          });
+        })
+        // $(".deleteitembutton").on('click', function (event) {
+
+
+        $("#cars")[0].selectedIndex = i;
+
+      });
+    });
+
+    $("#cars").change(function () {
+      window.location.href = `/table/${$('#cars').val()}`
+    })
+
+    //     PURE JAVA SCRIPT GENERATE TXT
+    // const createTextFile = (fileNmae, text) => {
+    //   const element = document.createElement('a');
+    //   element.setAttribute(
+    //     'href',
+    //     'data:text/plain;charset=utf-8,' + encodeURIComponent(text),
+    //   );
+    //   element.setAttribute('download', fileNmae);
+    //   element.style.display = 'none';
+    //   document.body.appendChild(element);
+    //   element.click();
+    //   document.body.removeChild(element);
+    // };
+    // createTextFile('test.txt', 'word');
+
+
+
+    // PURE JAVA SCRIPT GENERATE TXT
+    // let data = "some"
+    // let file = new Blob([data], {type: "txt"})
+
+    // // Appending to the file can be mimiced this way
+    // data = data+"Text"
+    // file = new Blob([data], {type: "txt"})
+
+    // // To Download this file
+    // let a = document.createElement("a"), url = URL.createObjectURL(file);
+    // a.href = url;
+    // a.download = file;
+    // document.body.appendChild(a);
+    // a.click()
+    // setTimeout(function() {
+    //   document.body.removeChild(a);
+    // }, 0);
+
+    //pure javascript generate pdf
+    // Create a new window
+    $("#printpdf").click(() => {
+      const printWindow = window.open('', '', 'height=600,width=800');
+
+      // Get the content you want to export
+      const content = document.getElementById('content-to-export').outerHTML;
+
+      // Write the content to the new window
+      printWindow.document.write('<html><head><title>Export as PDF</title>');
+      printWindow.document.write(`<style>
+    body { font-family: Arial, sans-serif; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+</style>`);
+      printWindow.document.write('</head><body>');
+      printWindow.document.write(content);
+      printWindow.document.write('</body></html>');
+
+      // Close the document to finish writing
+      printWindow.document.close();
+
+      // Wait for the content to load and then print
+      printWindow.onload = function () {
+        printWindow.print();
+        printWindow.close();
+      };
+    });
+
+  </script>
+</body>
+
+</html>
